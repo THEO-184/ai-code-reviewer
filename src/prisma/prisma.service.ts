@@ -5,7 +5,10 @@ import { PrismaClient } from '../../generated/prisma/client';
 const ExtendedPrismaClient = PrismaClient;
 
 @Injectable()
-export class PrismaService extends ExtendedPrismaClient implements OnModuleInit, OnModuleDestroy {
+export class PrismaService
+  extends ExtendedPrismaClient
+  implements OnModuleInit, OnModuleDestroy
+{
   async onModuleInit() {
     await this.$connect();
   }

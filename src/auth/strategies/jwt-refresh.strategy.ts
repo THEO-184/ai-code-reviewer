@@ -7,7 +7,10 @@ import { UsersService } from '../../users/users.service';
 import * as bcrypt from 'bcrypt';
 
 @Injectable()
-export class JwtRefreshStrategy extends PassportStrategy(Strategy, 'jwt-refresh') {
+export class JwtRefreshStrategy extends PassportStrategy(
+  Strategy,
+  'jwt-refresh',
+) {
   constructor(
     private readonly configService: ConfigService,
     private readonly usersService: UsersService,
@@ -28,7 +31,10 @@ export class JwtRefreshStrategy extends PassportStrategy(Strategy, 'jwt-refresh'
     const rawUser = await this.usersService.findByEmail(user!.email);
     if (!rawUser?.refreshToken) throw new UnauthorizedException();
 
-    const tokenMatches = await bcrypt.compare(refreshToken, rawUser.refreshToken);
+    const tokenMatches = await bcrypt.compare(
+      refreshToken,
+      rawUser.refreshToken,
+    );
     if (!tokenMatches) throw new UnauthorizedException();
 
     return user;

@@ -16,7 +16,7 @@ model User {
   createdAt    DateTime @default(now())
   updatedAt    DateTime @updatedAt
 
-  memberships  OrgMember[]
+  memberships OrgMember[]
 }
 
 model Organization {
@@ -56,22 +56,22 @@ model Repository {
 }
 
 model ChatSession {
-  id           String    @id @default(cuid())
+  id           String   @id @default(cuid())
   repositoryId String
-  createdAt    DateTime  @default(now())
+  createdAt    DateTime @default(now())
 
-  repository   Repository @relation(fields: [repositoryId], references: [id], onDelete: Cascade)
-  messages     Message[]
+  repository Repository @relation(fields: [repositoryId], references: [id], onDelete: Cascade)
+  messages   Message[]
 }
 
 model Message {
-  id            String      @id @default(cuid())
-  role          MessageRole
-  content       String
-  sessionId     String
-  createdAt     DateTime    @default(now())
+  id        String      @id @default(cuid())
+  role      MessageRole
+  content   String
+  sessionId String
+  createdAt DateTime    @default(now())
 
-  session       ChatSession @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+  session ChatSession @relation(fields: [sessionId], references: [id], onDelete: Cascade)
 }
 
 enum OrgRole {
