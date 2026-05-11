@@ -19,18 +19,14 @@ export class OrganizationsService {
     });
     if (existing) throw new ConflictException('Slug already taken');
 
-    // Transaction: create the org and make the creator OWNER atomically.
-    // If either insert fails, both roll back — you never get an org with no owner.
-    return this.prisma.$transaction(async (tx) => {
-      const org = await tx.organization.create({
-        data: { name: dto.name, slug: dto.slug },
-      });
-
-      await tx.orgMember.create({
-        data: { userId, orgId: org.id, role: OrgRole.OWNER },
-      });
-
-      return org;
+    // Nested write: org + OWNER membership in one round-trip.
+    // Prisma fills OrgMember.orgId automatically from the parent.
+    return this.prisma.organization.create({
+      data: {
+        name: dto.name,
+        slug: dto.slug,
+        members: { create: { userId, role: OrgRole.OWNER } },
+      },
     });
   }
 
