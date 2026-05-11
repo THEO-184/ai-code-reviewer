@@ -26,17 +26,13 @@ export class JwtRefreshStrategy extends PassportStrategy(
     const refreshToken = req.headers.authorization?.replace('Bearer ', '');
     if (!refreshToken) throw new UnauthorizedException();
 
-    const user = await this.usersService.findById(payload.sub);
-    // We need the raw user with refreshToken for comparison
-    const rawUser = await this.usersService.findByEmail(user!.email);
-    if (!rawUser?.refreshToken) throw new UnauthorizedException();
+    const user = await this.usersService.findByIdWithToken(payload.sub);
+    if (!user?.refreshToken) throw new UnauthorizedException();
 
-    const tokenMatches = await bcrypt.compare(
-      refreshToken,
-      rawUser.refreshToken,
-    );
+    const tokenMatches = await bcrypt.compare(refreshToken, user.refreshToken);
     if (!tokenMatches) throw new UnauthorizedException();
 
-    return user;
+    const { password: _, refreshToken: __, ...safeUser } = user;
+    return safeUser;
   }
 }

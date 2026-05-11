@@ -1,6 +1,7 @@
 import {
   Body,
   Controller,
+  Get,
   HttpCode,
   HttpStatus,
   Post,
@@ -42,8 +43,7 @@ export class AuthController {
     return this.authService.logout(req.user.id);
   }
 
-  @Post('me')
-  @HttpCode(HttpStatus.OK)
+  @Get('me')
   @UseGuards(JwtAuthGuard)
   me(@Request() req: any) {
     return req.user;
