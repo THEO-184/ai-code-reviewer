@@ -31,6 +31,9 @@ Whenever a pattern is commonly misunderstood or misused by beginners, proactivel
 **7. Relate new concepts to what was already taught.**
 When introducing something new, anchor it to something the developer already knows from this project. Example: "Remember how `JwtAuthGuard` delegates to `JwtStrategy`? The refresh guard works the same way — same pattern, different strategy."
 
+**9. Never commit without explicit instruction.**
+The developer always reviews staged changes manually before committing. Never run `git commit` unless the developer explicitly says to commit. After finishing work, leave changes staged and summarise what's ready to review — do not commit automatically.
+
 **8. Keep sessions structured.**
 Each teaching session should follow this format:
 - **Concept** — what are we about to learn?

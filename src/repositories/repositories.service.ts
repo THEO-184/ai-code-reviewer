@@ -5,6 +5,7 @@ import {
 } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { CreateRepositoryDto } from './dto/create-repository.dto';
+import { ListRepositoriesDto } from './dto/list-repositories.dto';
 import { OrgRole } from '../generated/prisma/enums';
 
 @Injectable()
@@ -29,13 +30,40 @@ export class RepositoriesService {
     });
   }
 
-  async findAllForOrg(orgId: string, userId: string) {
+  async findAllForOrg(orgId: string, userId: string, query: ListRepositoriesDto) {
     await this.assertIsOrgMember(orgId, userId);
 
-    return this.prisma.repository.findMany({
-      where: { orgId },
-      include: { _count: { select: { chatSessions: true } } },
-    });
+    const page = query.page ?? 1;
+    const limit = query.limit ?? 20;
+    const skip = (page - 1) * limit;
+
+    const where = {
+      orgId,
+      ...(query.search && {
+        name: { contains: query.search, mode: 'insensitive' as const },
+      }),
+    };
+
+    const [items, total] = await this.prisma.$transaction([
+      this.prisma.repository.findMany({
+        where,
+        skip,
+        take: limit,
+        orderBy: { createdAt: 'desc' },
+        include: { _count: { select: { chatSessions: true } } },
+      }),
+      this.prisma.repository.count({ where }),
+    ]);
+
+    return {
+      items,
+      meta: {
+        total,
+        page,
+        limit,
+        totalPages: Math.ceil(total / limit),
+      },
+    };
   }
 
   async findOne(orgId: string, repoId: string, userId: string) {

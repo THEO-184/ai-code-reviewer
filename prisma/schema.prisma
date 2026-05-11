@@ -17,6 +17,16 @@ model User {
   updatedAt    DateTime @updatedAt
 
   memberships OrgMember[]
+  profile     UserProfile?
+}
+
+model UserProfile {
+  id     String  @id @default(cuid())
+  bio    String?
+  avatar String?
+  userId String  @unique
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
 model Organization {
@@ -53,6 +63,9 @@ model Repository {
 
   organization Organization  @relation(fields: [orgId], references: [id], onDelete: Cascade)
   chatSessions ChatSession[]
+
+  @@index([orgId])
+  @@index([createdAt])
 }
 
 model ChatSession {
@@ -62,6 +75,8 @@ model ChatSession {
 
   repository Repository @relation(fields: [repositoryId], references: [id], onDelete: Cascade)
   messages   Message[]
+
+  @@index([repositoryId])
 }
 
 model Message {
@@ -72,6 +87,8 @@ model Message {
   createdAt DateTime    @default(now())
 
   session ChatSession @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+
+  @@index([sessionId])
 }
 
 enum OrgRole {

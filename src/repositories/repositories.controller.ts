@@ -4,11 +4,13 @@ import {
   Get,
   Param,
   Post,
+  Query,
   Request,
   UseGuards,
 } from '@nestjs/common';
 import { RepositoriesService } from './repositories.service';
 import { CreateRepositoryDto } from './dto/create-repository.dto';
+import { ListRepositoriesDto } from './dto/list-repositories.dto';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 
 @Controller('organizations/:orgId/repositories')
@@ -26,8 +28,12 @@ export class RepositoriesController {
   }
 
   @Get()
-  findAll(@Param('orgId') orgId: string, @Request() req: any) {
-    return this.reposService.findAllForOrg(orgId, req.user.id);
+  findAll(
+    @Param('orgId') orgId: string,
+    @Query() query: ListRepositoriesDto,
+    @Request() req: any,
+  ) {
+    return this.reposService.findAllForOrg(orgId, req.user.id, query);
   }
 
   @Get(':repoId')
